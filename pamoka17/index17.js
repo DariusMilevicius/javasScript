@@ -49,3 +49,12 @@ for (let i = 0; i < skaiciai1.length; i++ ){
     }
 }
 console.log(didziausiasSkaicius)
+
+let vartotojoIvestis = prompt("Kokia yra jusu sekanti komanda")
+
+while (vartotojoIvestis !== 'quit') {
+    vartotojoIvestis = prompt("Kokia yra jusu sekanti komanda")
+    
+  }
+
+
