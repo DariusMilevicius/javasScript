@@ -4,7 +4,7 @@ const randomNumbers = [1, 22, 543, 2, 6, 12, 55, 86, 6, 9, 12, 31, 51, 92, 3]
 
 
 randomNumbers.sort(function(a, b) {
-    return a - b;
+     return a - b;
   });
   console.log(randomNumbers);
 
@@ -34,4 +34,5 @@ if (num % 7 === 0 ) {
 }
 }
 
-console.log(septiniuKartotinis(67))
+
+septiniuKartotinis(7)
