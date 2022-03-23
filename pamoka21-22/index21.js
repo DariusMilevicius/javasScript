@@ -224,7 +224,50 @@ function sukuriamaVienaKortele(arr){
     })
 }
 
+function pirmasPaspaudimas (){
+  console.log ("pirmas mygtukas paspausti")
+}
+
+const mygtukas = document.getElementById("button");
+mygtukas.addEventListener("click", pirmasPaspaudimas);
+
+function secondClick() {
+  console.log('Second button was pressed');
+}
+
+let secondButton = document.createElement('button');
+secondButton.textContent = 'Antras'
+document.body.appendChild(secondButton);
+secondButton.onclick = secondClick;
 
 
 
+// let secondButton = document.createElement('button');
+// mygtukas2.textContent = "Antras"
+// document.body.appendChild(antrasmygtukas)
 
+// mygtukas2.onclick = secondClick;
+
+// function secondClick() {
+//   console.log('Second button was pressed');
+// }
+
+
+
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+const mygtukasKeiciaSpalva = document.getElementById("pakeitimoMygtukas");
+
+function pakeiciaSpalva (){
+let red= Math.floor(Math.random()*256);
+let blue=  Math.floor(Math.random()*256);
+let green=  Math.floor(Math.random()*256);
+document.body.style.backgroundColor = `rgb(${red}, ${blue}, ${green})`
+}
+
+mygtukasKeiciaSpalva.addEventListener("click", pakeiciaSpalva);
+
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+let buttons = document.querySelectorAll('button')
+buttons.forEach(item => item.onclick = pakeiciaSpalva);
