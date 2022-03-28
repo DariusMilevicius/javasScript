@@ -22,3 +22,7 @@ myInput.addEventListener('input', addText)
 // myInput.addEventListener("input", function(event){
 //     h1.innerText = `Sveiki  ${event.target.value}`
 // })
+
+
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
