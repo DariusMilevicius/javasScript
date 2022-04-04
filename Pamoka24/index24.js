@@ -1,83 +1,188 @@
-// Project - Sukursime ToDo saraso aplikacija
-// 1. suskikurti UL ir prisidedam ji i document body
-const myContainer = document.querySelector('.container');
+window.onload = function() {
+  let grizedarbai = JSON.parse(localStorage.getItem('darbai'));
+  console.log(grizedarbai)
+};
 
+
+// Global selectors  and variables // 
+const myContainer = document.querySelector('.container');
 let myInput = document.querySelector('input');
 let myBtn = document.querySelector('button');
+const myProgressLabel = document.querySelector('.progress-label');
+const removeAllBtn = document.querySelector('#all');
+
+const myProgressBar = document.querySelector('progress')
 const myToDoUl = document.createElement('ul');
 myContainer.appendChild(myToDoUl);
-// 2.1 Mygtukas turi tureti event listeneri
+
+let totalNumberOfTodos = 0;
+let completedTodos = 0;
+let percentOfCompetedTasks = 0;
+
+let myTodosList = [];
+
 myBtn.addEventListener('click', function(){
-// ----------- String interpolation ---------- //
-// if (myInput.value.length > 0) {
-//   let newToDo = `<li>
-//   <div class="left-side">
-//     <input type="checkbox">
-//     <span>${myInput.value}
-//   </div>
-//   <div class="right-side">
-//     <i class="bi bi-pencil-fill"></i>
-//     <i class="bi bi-trash-fill"></i>
-//   </div>
-// </li>`
-// myToDoUl.insertAdjacentHTML("beforeend", newToDo)
-//   myInput.value = '';
-// } else {
-//   alert('Enter the task')
-// }
-// ----------- End of string interpolation
-
-
-  // 2.2 Issisaugoti teksta i kintamaji
   let inputText = myInput.value;
-  // 2.21 patikrinti ar inputas nera tuscias
+
   if (inputText.length > 0) {
-    // 2.3 teksta kartu su li isideti i ul
   let myLi = document.createElement('li');
-  myLi.innerText = inputText;
-      // prideti ckeck box'a
   const checkBoxInput = document.createElement('input');
+  // will use in localStorage 
+  myTodosList.push(
+    {
+      todo: inputText,
+      done: false,
+    }
+  )
+ 
+  
   checkBoxInput.setAttribute('type', 'checkbox');
-  checkBoxInput.addEventListener('click', () => console.log('checkbox'));
+  checkBoxInput.addEventListener('click', (event) => {
+   
+    let jobThatImEditing = event.target.nextElementSibling.textContent
+    
 
-  myLi.appendChild(checkBoxInput);
-// prideti ikonas is general chato
-const deleteIcon = document.createElement('i');
-const deleteClassList = ['bi', 'bi-trash-fill'];
-// naudojame spread operatoriu 
-// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax
-deleteIcon.classList.add(...deleteClassList);
-deleteIcon.addEventListener('click', () => console.log('delete'));
+    myTodosList.forEach(job => 
+      job.todo === jobThatImEditing ? job.done = !job.done : job)
+    // job yra kievienas darbas musu masyve 
+    //  -  {todo: inputText, done: false} 
+    // job.todo yra mano li kuriame paspaudziau checkbox tekstas
+    // identiskas variantas uzrasytas su paprasta funkcija
+    // myTodosList.forEach(function(job) {
+    //   if(job.todo === jobThatImEditing) {
+    //     job.done = !job.done
+    //   } else {
+    //     return job
+    //   }
+    // })
+    //
+    console.log(myTodosList)
 
-const editIcon = document.createElement('i');
+    event.target.parentElement.classList.toggle('atlikta')
+    completedTodos = document.querySelectorAll('.atlikta').length
+    myProgressLabel.innerHTML = `${completedTodos} of ${totalNumberOfTodos}`
+
+
+    percentOfCompetedTasks = Math.floor(completedTodos === 0 ? 0 : (completedTodos / totalNumberOfTodos) * 100 );
+    myProgressBar.value = percentOfCompetedTasks;
+  });
+
+  const editIcon = document.createElement('i');
 const editClassList = ['bi', 'bi-pencil-fill']
 editIcon.classList.add(...editClassList);
 
-editIcon.addEventListener('click', () => console.log('edit'));
+  const mySpan = document.createElement('span')
+  mySpan.innerText = inputText;
+  const todoEditInput = document.createElement('input');
+  todoEditInput.setAttribute('class', 'hidden');
+  todoEditInput.setAttribute('type', 'text');
+  // naudosime veliasniam selectoriui - .querySelector('input[type=text]'
+  todoEditInput.setAttribute('value', inputText);
+
+  function toggleEdit() {
+    mySpan.classList.toggle('hidden');
+    todoEditInput.classList.toggle('hidden')
+    mySpan.innerText = todoEditInput.value
+  }
+
+
+  todoEditInput.addEventListener('keydown', (event) => {
+    if (event.code === 'Enter') toggleEdit()
+    
+  })
+
+  editIcon.addEventListener('click', function(event) {
+    // naudosiu tam, kad galeciau susirasti job kuri keiciu sename masyve
+    let oldValue = event.target.parentNode.textContent;
+    // sita reiksme perrasysiu senaja reiksme
+    let newValue = event.target.parentNode.querySelector('input[type=text]').value;
+    // einu per savo darbu masyva [ job, job, job] 
+    // kiekvienas job yra nauajs {todo: inputText, done: false} elemntas mano masyve
+    myTodosList.forEach(job => 
+      job.todo === oldValue ? job.todo = newValue : job)
+      // kad gauti value, man reikia nurodyti key kuris naudojamas job objekte
+      
+      // ternary operatoriaus paaiskinimas
+      // salyga ? ka grazinsime jei ji teisinga : ka grazinsime jei neteisinga
+      // ? gali buti isivaizduojamas kaip if
+      // : galime isivaizduoti kaip else
+    toggleEdit()
+  })
+
+
+
+const deleteIcon = document.createElement('i');
+const deleteClassList = ['bi', 'bi-trash-fill'];
+deleteIcon.classList.add(...deleteClassList);
+
+deleteIcon.addEventListener('click', (event) => {
+  // currentValue bus naudojama susrasti darba kuri trinsime
+  let currentValue = event.target.parentNode.textContent;
+  // jei radau dabra kurio todo reiksme sutampa su currentValue paimu savo myTodosList
+  // masyva is is jo pasalinu viena darba tie atitinkamu index
+  myTodosList.forEach((job, index) => 
+  // viduje galioja tas pats job ir index, pasikeitus job keiciasi ir index
+  (job.todo === currentValue ? myTodosList.splice(index, 1) : job) )
+  // ['cat', 'dog', 'frog']
+  // primas ratas -> job = cat, index = 0
+  // antras ratas -> job = dog, index = 1
+  // trecias ratas -> job = frog, index = 2
+
+  // myTodosList.splice(index, 1) Paaiskinimas 
+  // splice pirmas parametras nurodo, elemento, kuri trinsime vieta masyve - index
+  // antras parametras nurodo kiek elementu triname, siuo atveju 1
+  // nenurodzius kiek elementu triname, butu pasalinti visi
+
+  event.target.parentElement.remove();
+  completedTodos = document.querySelectorAll('.atlikta').length
+  totalNumberOfTodos = document.querySelectorAll('li').length;
+  myProgressLabel.innerHTML = `${completedTodos} of ${totalNumberOfTodos}`
+
+  percentOfCompetedTasks = Math.floor(completedTodos === 0 ? 0 : (completedTodos / totalNumberOfTodos) * 100 );
+  myProgressBar.value = percentOfCompetedTasks;
+});
 
 myLi.appendChild(checkBoxInput)
+myLi.appendChild(mySpan)
+myLi.appendChild(todoEditInput)
+
 myLi.appendChild(deleteIcon)
 myLi.appendChild(editIcon)
 
-// check box'ui ir ikonoms uzdeti event listenerius
-// paspaudus kazkuri is ju, turetu parasyti koks 
-// elementas buvo paspaustas
-  myToDoUl.appendChild(myLi)
-  // 2.3 istrinu teksta is input elemento
-  myInput.value = ''
 
+  myToDoUl.appendChild(myLi)
+  totalNumberOfTodos = document.querySelectorAll('li').length;
+
+  percentOfCompetedTasks = 
+  Math.floor(completedTodos === 0 ? 0 : (completedTodos / totalNumberOfTodos) * 100 );
+
+  myProgressBar.value = percentOfCompetedTasks;
+  myProgressLabel.innerHTML = `${completedTodos} of ${totalNumberOfTodos}`
+  myInput.value = ''
 
   } else {
     alert('Iveskite uzduoti')
   }
-
-
+  // console.log(myTodosList)
 })
 
 
 
+removeAllBtn.addEventListener('click', function() {
 
-//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-localStorage.setItem('kaipIsmokti', 'Bandyti');
-const tests = localStorage.setItem('kaipIsmokti');
-console.log(tests)
+  let newCOmpletedTodos = myTodosList.filter(job => job.done !== true)
+
+  let allCompletedTasks = document.querySelectorAll('.atlikta');
+  allCompletedTasks.forEach(item => item.remove());
+  totalNumberOfTodos = document.querySelectorAll('li').length;
+  completedTodos = 0
+  myProgressLabel.innerHTML = `${completedTodos} of ${totalNumberOfTodos}`
+  myProgressBar.value = 0;
+  myTodosList = [...newCOmpletedTodos]
+  // ... dar vadinamas spread operatoriumi
+})
+
+
+window.addEventListener("beforeunload", function(){
+  localStorage.setItem('darbai', JSON.stringify(myTodosList))
+})
